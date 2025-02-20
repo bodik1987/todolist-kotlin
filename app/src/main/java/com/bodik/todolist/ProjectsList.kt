@@ -4,16 +4,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -31,11 +29,12 @@ import androidx.navigation.NavController
 
 @Composable
 fun ProjectsList(
-    preferencesHelper: PreferencesHelper,
     projectsState: MutableState<List<Project>>,
-    navController: NavController
+    navController: NavController,
+    listState: LazyListState
 ) {
     val projects = projectsState.value
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -53,7 +52,7 @@ fun ProjectsList(
                 )
             }
         } else {
-            LazyColumn {
+            LazyColumn(state = listState) {
                 items(projects) { project ->
                     ListItem(
                         modifier = Modifier

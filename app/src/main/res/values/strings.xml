@@ -3,6 +3,11 @@
     <string name="bottom_navigation_home">Home</string>
     <string name="save">Save</string>
     <string name="add_project">Add project</string>
+    <string name="add_chapter">Add chapter</string>
     <string name="new_project">New project</string>
+    <string name="new_chapter">New chapter</string>
+    <string name="todo">Todo</string>
+    <string name="note">Note</string>
+    <string name="additional_text">Additional text</string>
     <string name="empty_list">Empty list</string>
 </resources>

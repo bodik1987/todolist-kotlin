@@ -9,12 +9,11 @@ data class Project(
     val title: String,
 )
 
-//data class Chapter(
-//    val id: String,
-//    val title: String,
-//    val projectId: String,
-//    val items: List<Item> // List of Todo or Note items
-//)
+data class Chapter(
+    val id: String,
+    val title: String,
+    val projectId: String,
+)
 
 data class Todo(
     val id: String,
@@ -67,6 +66,35 @@ class PreferencesHelper(context: Context) {
             }
         }
         return projects
+    }
+
+    // Chapters
+    fun saveChapters(chapters: List<Chapter>) {
+        val editor = sharedPreferences.edit()
+        editor.putInt("chapter_count", chapters.size)
+
+        chapters.forEachIndexed { index, chapter ->
+            editor.putString("chapter_${index + 1}_id", chapter.id)
+            editor.putString("chapter_${index + 1}_title", chapter.title)
+            editor.putString("chapter_${index + 1}_projectId", chapter.projectId)
+        }
+        editor.apply()
+    }
+
+    fun loadChapters(): List<Chapter> {
+        val chapterCount = sharedPreferences.getInt("chapter_count", 0)
+        val chapters = mutableListOf<Chapter>()
+
+        for (i in 1..chapterCount) {
+            val id = sharedPreferences.getString("chapter_${i}_id", "") ?: ""
+            val title = sharedPreferences.getString("chapter_${i}_title", "") ?: ""
+            val projectId = sharedPreferences.getString("chapter_${i}_projectId", "") ?: ""
+
+            if (id.isNotEmpty() && title.isNotEmpty() && projectId.isNotEmpty()) {
+                chapters.add(Chapter(id, title, projectId))
+            }
+        }
+        return chapters
     }
 }
 

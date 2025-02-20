@@ -15,15 +15,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,9 +40,7 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -78,7 +79,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@SuppressLint("DefaultLocale", "UnusedMaterial3ScaffoldPaddingParameter")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(modifier: Modifier = Modifier) {
@@ -94,7 +95,9 @@ fun App(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val preferencesHelper = PreferencesHelper(context)
     val addProjectModal = remember { mutableStateOf(false) }
+
     val projectsState = remember { mutableStateOf(preferencesHelper.loadProjects()) }
+    val chaptersState = remember { mutableStateOf(preferencesHelper.loadChapters()) }
 
     Scaffold(
         topBar = {
@@ -144,7 +147,12 @@ fun App(modifier: Modifier = Modifier) {
             ) { backStackEntry ->
                 val projectId = backStackEntry.arguments?.getString("projectId")
                 val projectTitle = backStackEntry.arguments?.getString("projectTitle")
-                ProjectScreen(projectId = projectId, projectTitle = projectTitle)
+                ProjectScreen(
+                    projectId = projectId,
+                    projectTitle = projectTitle,
+                    chaptersState = chaptersState,
+                    preferencesHelper = preferencesHelper,
+                )
             }
         }
     }
@@ -162,26 +170,27 @@ fun Home(
     var projectTitle by remember { mutableStateOf("") }
     val focusRequesterProject = remember { FocusRequester() }
 
+    val listState = rememberLazyListState()
+    val expandedFab by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
+
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = {
                     projectTitle = ""
                     addProjectModal.value = true
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null
-                )
-            }
+                },
+                expanded = expandedFab,
+                icon = { Icon(Icons.Filled.Add, "Localized Description") },
+                text = { Text(text = stringResource(id = R.string.add_project)) },
+            )
         },
         floatingActionButtonPosition = FabPosition.End,
         content = { innerPadding ->
             ProjectsList(
-                preferencesHelper = preferencesHelper,
                 projectsState = projectsState,
-                navController = navController
+                navController = navController,
+                listState = listState
             )
 
             if (addProjectModal.value) {
@@ -203,6 +212,7 @@ fun Home(
                         BasicTextField(
                             value = projectTitle,
                             onValueChange = { projectTitle = it },
+                            singleLine = true,
                             keyboardOptions = KeyboardOptions(
                                 capitalization = KeyboardCapitalization.Sentences,
                                 imeAction = ImeAction.Done
