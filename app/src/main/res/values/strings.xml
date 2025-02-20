@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Todolist</string>
+    <string name="bottom_navigation_home">Home</string>
+    <string name="save">Save</string>
+    <string name="add_project">Add project</string>
+    <string name="new_project">New project</string>
+    <string name="empty_list">Empty list</string>
+</resources>
